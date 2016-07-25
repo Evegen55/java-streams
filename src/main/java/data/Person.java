@@ -27,14 +27,29 @@ public class Person {
         return age;
     }
 
+    /**
+     * factory method
+     * @param firstName
+     * @return new Person
+     */
     public Person withFirstName(String firstName) {
         return new Person(firstName, lastName, age);
     }
 
+    /**
+     * factory method
+     * @param lastName
+     * @return new Person
+     */
     public Person withLastName(String lastName) {
         return new Person(firstName, lastName, age);
     }
 
+    /**
+     * factory method
+     * @param age
+     * @return new Person
+     */
     public Person withAge(int age) {
         return new Person(firstName, lastName, age);
     }

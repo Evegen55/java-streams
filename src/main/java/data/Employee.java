@@ -17,10 +17,20 @@ public class Employee {
         this.jobHistory = jobHistory;
     }
 
+    /**
+     * factory method
+     * @param p
+     * @return new Employee
+     */
     public Employee withPerson(Person p) {
         return new Employee(p, jobHistory);
     }
 
+    /**
+     * factory method
+     * @param h
+     * @return new Employee
+     */
     public Employee withJobHistory(List<JobHistoryEntry> h) {
         return new Employee(person, h);
     }

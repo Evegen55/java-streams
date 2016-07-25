@@ -28,14 +28,29 @@ public class JobHistoryEntry {
         return employer;
     }
 
+    /**
+     * factory method
+     * @param duration
+     * @return new JobHistoryEntry
+     */
     public JobHistoryEntry withDuration(int duration) {
         return new JobHistoryEntry(duration, position, employer);
     }
 
+    /**
+     * factory method
+     * @param position
+     * @return new JobHistoryEntry
+     */
     public JobHistoryEntry withPosition(String position) {
         return new JobHistoryEntry(duration, position, employer);
     }
 
+    /**
+     * factory method
+     * @param employer
+     * @return new JobHistoryEntry
+     */
     public JobHistoryEntry withEmployer(String employer) {
         return new JobHistoryEntry(duration, position, employer);
     }
