@@ -3,10 +3,12 @@ package lesson4.exercise;
 import data.Employee;
 import data.JobHistoryEntry;
 import data.Person;
+
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,6 +17,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class StreamsExercise {
     // https://youtu.be/kxgo7Y4cdA8 Сергей Куксенко и Алексей Шипилёв — Через тернии к лямбдам, часть 1
@@ -66,41 +70,83 @@ public class StreamsExercise {
                 .collect(toList());
     }
 
+    /**
+     * was doing
+     * @return
+     */
     private static Employee generateEmployee() {
-        // TODO
-        throw new UnsupportedOperationException();
+        return new Employee(
+        		generatePerson(),
+        		generateJobHistory()
+        		);
     }
-
+    
+    /**
+     * was doing
+     * @return
+     */
     private static List<Employee> generateEmployeeList() {
-        // TODO
-        throw new UnsupportedOperationException();
+        int maxLength = 10;
+        final int length = ThreadLocalRandom.current().nextInt(maxLength) + 1;
+        
+        return Stream.generate(StreamsExercise::generateEmployee)
+                .limit(length - 1)
+                .collect(toList());
     }
 
+    /**
+     * was doing
+     */
     @Test
     public void sumEpamDurations() {
         final List<Employee> employees = generateEmployeeList();
 
+        //for expected
         int expected = 0;
 
         for (Employee e: employees) {
-            for (JobHistoryEntry j :      e.getJobHistory()) {
+            for (JobHistoryEntry j : e.getJobHistory()) {
                 if (j.getEmployer().equals("epam")) {
                     expected += j.getDuration();
                 }
             }
         }
 
-        // TODO
-        throw new UnsupportedOperationException();
-
-        // int result = ???
-        // assertEquals(expected, result);
+        // TODO for result
+        int result = employees.stream()
+        		.flatMap(e -> e.getJobHistory().stream()
+        				.filter(j -> j.getEmployer().equals("epam")))
+        		.mapToInt(e -> e.getDuration()).sum();
+        assertEquals(expected, result);
     }
 
+    /**
+     * was doing
+     */
     @Test
     public void getAllEpamEmployees() {
-        List<Person> epamEmployees = null;// TODO all persons with experience in epam
-        throw new UnsupportedOperationException();
+    	
+    	// TODO all persons with experience in epam
+    	final List<Employee> employees = generateEmployeeList();
+    	//create list with only persons with experience in epam
+        List<Person> epamEmployees = new LinkedList<>();
+        for (Employee e: employees) {
+            for (JobHistoryEntry j : e.getJobHistory()) {
+                if (j.getEmployer().equals("epam")) {
+                	epamEmployees.add(e.getPerson());
+                }
+            }
+        }
+        //TODO find use stream
+        List<Person> epamEmployeesLambda = employees.stream()
+        		.filter(e -> e.getJobHistory().stream()
+        				.map(JobHistoryEntry::getEmployer)
+        				.anyMatch("epam"::equals)
+        				)
+        		.map(e -> e.getPerson())
+        		.collect(toList());
+        
+        assertThat(epamEmployees, is(epamEmployeesLambda));
     }
 
     @Test
@@ -113,7 +159,7 @@ public class StreamsExercise {
 
     @Test
     public void indexByFirstEmployer() {
-        Map<String, List<Person>> employeesIndex = null;// TODO
+        Map<String, List<Person>> employeesIndex = null; //TODO
         throw new UnsupportedOperationException();
     }
 
