@@ -132,7 +132,7 @@ public class StreamsExercise {
         List<Person> epamEmployees = new LinkedList<>();
         for (Employee e: employees) {
             for (JobHistoryEntry j : e.getJobHistory()) {
-                if (j.getEmployer().equals("epam")) {
+                if (j.getEmployer().equals("epam") && !epamEmployees.contains(e.getPerson())) {
                 	epamEmployees.add(e.getPerson());
                 }
             }
@@ -145,7 +145,6 @@ public class StreamsExercise {
         				)
         		.map(e -> e.getPerson())
         		.collect(toList());
-        
         assertThat(epamEmployees, is(epamEmployeesLambda));
     }
 
