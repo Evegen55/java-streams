@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -150,21 +151,62 @@ public class StreamsExercise {
 
     @Test
     public void getEmployeesStartedFromEpam() {
-        List<Person> epamEmployees = null;// TODO all persons with first experience in epam
-        throw new UnsupportedOperationException();
+        // TODO all persons with first experience in epam
+        //final List<Employee> employees = generateEmployeeList();
+        final List<Employee> employees = getEmployees();
+        //a standart way
+        List<Person> epamEmployees = new LinkedList<>();
+        for (Employee e: employees) {
+            final JobHistoryEntry j = e.getJobHistory().get(0);
+            if (j.getEmployer().equals("epam") && !epamEmployees.contains(e.getPerson())) {
+                epamEmployees.add(e.getPerson());
+            }
+        }
+        //test
+        //System.out.println("epamEmployees" + epamEmployees);
+        List<Person> epamEmployeesLambda = employees.stream()
+                .filter(e -> e.getJobHistory()
+                        .get(0)
+                        .getEmployer()
+                        .equals("epam"))
+                .map(Employee::getPerson)
+                .collect(toList());
+        //test
+        //System.out.println("epamEmployeesLambda " + epamEmployeesLambda);
+        assertThat(epamEmployees, is(epamEmployeesLambda));
     }
 
     // https://github.com/senia-psm/java-streams
 
     @Test
     public void indexByFirstEmployer() {
-        Map<String, List<Person>> employeesIndex = null; //TODO
-        throw new UnsupportedOperationException();
+        //TODO
+        final List<Employee> employees = getEmployees();
+        Map<String, List<Person>> employeesIndex = new HashMap<>();
+        for (Employee e: employees) {
+            for (JobHistoryEntry j : e.getJobHistory()) {
+                if (!employeesIndex.containsKey(j.getEmployer())) {
+                    List<Person> persons = new LinkedList<>();
+                    persons.add(e.getPerson());
+                    employeesIndex.put(j.getEmployer(), persons);
+                } else {
+                    Person p = e.getPerson();
+                    String employer = j.getEmployer();
+                    List<Person> persons = employeesIndex.get(employer);
+                    if (!persons.contains(p)) {
+                        persons.add(p);
+                    }
+                    employeesIndex.put(employer, persons);
+                }
+            }
+        }
+    //print it for test use streams
+    employeesIndex.entrySet().forEach(System.out::println);
+    //TODO it use streams API
+    
     }
 
-
     // TODO class PersonEmployerPair
-
     @Test
     public void employersStuffLists() {
         Map<String, List<Person>> employersStuffLists = null;// TODO
