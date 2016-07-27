@@ -202,11 +202,47 @@ public class StreamsExercise {
         }
     //print it for test use streams
     employeesIndex.entrySet().forEach(System.out::println);
-    //TODO it use streams API
     
+    
+    //TODO it use streams API
+    //цель получить список пар первый работодатель/список лиц с первым работодателем
+    Stream<PersonEmployerPair> flatMap = employees.stream()
+            .flatMap(e ->
+                    e.getJobHistory().stream()
+                            .findFirst()
+                            .map(Stream::of)
+                            .orElseGet(Stream::empty)
+                            .map(er -> new PersonEmployerPair(e.getPerson(), er.getEmployer()))
+                    );
+    //Collectors.mapping(mapper, downstream)
+    Map<String, List<PersonEmployerPair>> collect = flatMap
+            .collect(Collectors.groupingBy(
+                    PersonEmployerPair::getEmployer, toList()));
+    
+    
+            
     }
 
     // TODO class PersonEmployerPair
+    private static class PersonEmployerPair {
+        private Person p;
+        private String employer;
+        
+        public PersonEmployerPair(Person p, String employer) {
+            this.p = p;
+            this.employer = employer;
+        }
+        
+        public Person getPerson() {
+            return p;
+        }
+        
+        public String getEmployer() {
+            return employer;
+        }
+    }
+
+
     @Test
     public void employersStuffLists() {
         Map<String, List<Person>> employersStuffLists = null;// TODO
