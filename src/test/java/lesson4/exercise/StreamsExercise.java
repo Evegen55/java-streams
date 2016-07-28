@@ -180,47 +180,46 @@ public class StreamsExercise {
 
     @Test
     public void indexByFirstEmployer() {
-        //TODO
-        final List<Employee> employees = getEmployees();
-        Map<String, List<Person>> employeesIndex = new HashMap<>();
-        for (Employee e: employees) {
-            for (JobHistoryEntry j : e.getJobHistory()) {
-                if (!employeesIndex.containsKey(j.getEmployer())) {
-                    List<Person> persons = new LinkedList<>();
-                    persons.add(e.getPerson());
-                    employeesIndex.put(j.getEmployer(), persons);
-                } else {
-                    Person p = e.getPerson();
-                    String employer = j.getEmployer();
-                    List<Person> persons = employeesIndex.get(employer);
-                    if (!persons.contains(p)) {
-                        persons.add(p);
-                    }
-                    employeesIndex.put(employer, persons);
-                }
-            }
-        }
-    //print it for test use streams
-    employeesIndex.entrySet().forEach(System.out::println);
-    
-    
-    //TODO it use streams API
-    //цель получить список пар первый работодатель/список лиц с первым работодателем
-    Stream<PersonEmployerPair> flatMap = employees.stream()
-            .flatMap(e ->
-                    e.getJobHistory().stream()
-                            .findFirst()
-                            .map(Stream::of)
-                            .orElseGet(Stream::empty)
-                            .map(er -> new PersonEmployerPair(e.getPerson(), er.getEmployer()))
-                    );
-    //Collectors.mapping(mapper, downstream)
-    Map<String, List<PersonEmployerPair>> collect = flatMap
-            .collect(Collectors.groupingBy(
-                    PersonEmployerPair::getEmployer, toList()));
-    
-    
-            
+        //TODO as standart way
+    	final List<Employee> employees = getEmployees();
+    	Map<String, List<Person>> employeesIndex = new HashMap<>();
+    	for (Employee e: employees) {
+    		 JobHistoryEntry j = e.getJobHistory().get(0); 
+    			 if (!employeesIndex.containsKey(j.getEmployer())) {
+    				 List<Person> persons = new LinkedList<>();
+    				 persons.add(e.getPerson());
+    				 employeesIndex.put(j.getEmployer(), persons);
+    			 } else {
+    				 Person p = e.getPerson();
+    				 String employer = j.getEmployer();
+    				 List<Person> persons = employeesIndex.get(employer);
+    				 if (!persons.contains(p)) {
+    					 persons.add(p);
+    				 }
+    				 employeesIndex.put(employer, persons);
+    			 }
+    	}
+    	//print it for test use streams
+    	employeesIndex.entrySet().forEach(System.out::println);
+    	
+    	//TODO it use streams API
+    	//цель получить список пар первый работодатель/список лиц с первым работодателем
+    	Stream<PersonEmployerPair> flatMap = employees.stream()
+    			.flatMap(
+    					e -> e.getJobHistory().stream()
+    					.findFirst()
+    					.map(Stream::of)
+    					.orElseGet(Stream::empty)
+    					.map(er -> new PersonEmployerPair(e.getPerson(), er.getEmployer()))
+				        );
+    	Map<String, List<Person>> employeesIndexLambda = flatMap
+    								.collect(Collectors.groupingBy(
+    										PersonEmployerPair::getEmployer, 
+    										Collectors.mapping(PersonEmployerPair::getPerson,toList())));
+    	//print it for test use streams
+    	employeesIndexLambda.entrySet().forEach(System.out::println);
+    	assertThat(employeesIndex, is(employeesIndexLambda));
+         
     }
 
     // TODO class PersonEmployerPair
@@ -245,8 +244,48 @@ public class StreamsExercise {
 
     @Test
     public void employersStuffLists() {
-        Map<String, List<Person>> employersStuffLists = null;// TODO
-        throw new UnsupportedOperationException();
+        // TODO компания и список сотрудников которые в ней когда либо работали
+        //Map<String, List<Person>> employersStuffLists = null;
+        
+        //TODO as standart way
+    	final List<Employee> employees = getEmployees();
+    	Map<String, List<Person>> employersStuffLists = new HashMap<>();
+    	for (Employee e: employees) {
+    		
+    		 for (JobHistoryEntry j:e.getJobHistory()) {
+    			 if (!employersStuffLists.containsKey(j.getEmployer())) {
+    				 List<Person> persons = new LinkedList<>();
+    				 persons.add(e.getPerson());
+    				 employersStuffLists.put(j.getEmployer(), persons);
+    			 } else {
+    				 Person p = e.getPerson();
+    				 String employer = j.getEmployer();
+    				 List<Person> persons = employersStuffLists.get(employer);
+    				 if (!persons.contains(p)) {
+    					 persons.add(p);
+    				 }
+    				 employersStuffLists.put(employer, persons);
+    			 }
+    		 }
+    	}
+    	//print it for test use streams
+    	employersStuffLists.entrySet().forEach(System.out::println);
+    	System.out.println("after");
+    	
+    	//TODO it use StreamAPI
+    	Stream<PersonEmployerPair> flatMap = employees.stream()
+    			.flatMap(
+    					e -> e.getJobHistory().stream()
+    					.map(er -> new PersonEmployerPair(e.getPerson(), er.getEmployer()))
+				        );
+    	Map<String, List<Person>> employersStuffListsLambda = flatMap
+    								.collect(Collectors.groupingBy(
+    										PersonEmployerPair::getEmployer, 
+    										Collectors.mapping(PersonEmployerPair::getPerson,toList())));
+    	//print it for test use streams
+    	employersStuffListsLambda.entrySet().forEach(System.out::println);    	
+    	assertThat(employersStuffLists, is(employersStuffListsLambda));
+
     }
 
     private List<Employee> getEmployees() {
