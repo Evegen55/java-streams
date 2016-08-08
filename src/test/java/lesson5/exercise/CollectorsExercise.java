@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.*;
 
 public class CollectorsExercise {
 
@@ -49,14 +50,37 @@ public class CollectorsExercise {
         public int getDuration() {
             return duration;
         }
-    }
+
+            @Override
+            public String toString() {
+                return "PersonPositionDuration{" +
+                        "person=" + person +
+                        ", position='" + position + '\'' +
+                        ", duration=" + duration +
+                        '}';
+            }
+        }
 
     // With the longest duration on single job
     private Map<String, Person> getCoolestByPosition(List<Employee> employees) {
+        //employees.stream().forEach(System.out::println);
         // First option
         // Collectors.maxBy
         // Collectors.collectingAndThen
         // Collectors.groupingBy
+
+        //make a stream with static possibilities
+        Stream<PersonPositionDuration> personPositionDurationStream = employees.stream()
+                .flatMap(e -> e.getJobHistory().stream()
+                        .map(ppd -> new PersonPositionDuration(e.getPerson(), ppd.getPosition(), ppd.getDuration())));
+        //make a map that first groupping by position, then collecting to a list, find max duration and return person
+        Map<String, Person> collect1 = personPositionDurationStream
+                .collect(groupingBy(
+                        PersonPositionDuration::getPosition,
+                        collectingAndThen(maxBy(comparing(PersonPositionDuration::getDuration)),
+                                personPositionDuration -> personPositionDuration.get().getPerson())
+                        )
+                );
 
         // Second option
         // Collectors.toMap
