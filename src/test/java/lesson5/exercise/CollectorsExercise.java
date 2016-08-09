@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.*;
 
 public class CollectorsExercise {
@@ -81,11 +82,29 @@ public class CollectorsExercise {
                                 personPositionDuration -> personPositionDuration.get().getPerson())
                         )
                 );
+        //print result
+        collect1.entrySet().stream().forEach(System.out::println);
 
         // Second option
         // Collectors.toMap
         // iterate twice: stream...collect(...).stream()...
         // TODO
+        System.out.println("////");
+        //make a stream with static possibilities
+        Stream<PersonPositionDuration> personPositionDurationStream1 = employees.stream()
+                .flatMap(e -> e.getJobHistory().stream()
+                        .map(ppd -> new PersonPositionDuration(e.getPerson(), ppd.getPosition(), ppd.getDuration())));
+
+        personPositionDurationStream1
+                .collect(toMap(PersonPositionDuration::getPosition,
+                        Function.identity(), (pp1, pp2) -> {
+
+                        }
+                        )
+                );
+
+        collect.entrySet().stream().forEach(System.out::println);
+
         throw new UnsupportedOperationException();
     }
 
