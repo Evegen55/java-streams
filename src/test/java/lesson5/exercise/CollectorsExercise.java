@@ -17,7 +17,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.*;
 
 public class CollectorsExercise {
@@ -29,16 +28,16 @@ public class CollectorsExercise {
         coolestByPosition.forEach((position, person) -> System.out.println(position + " -> " + person));
     }
 
-        private static class PersonPositionDuration {
-            private final Person person;
-            private final String position;
-            private final int duration;
+    private static class PersonPositionDuration {
+        private final Person person;
+        private final String position;
+        private final int duration;
 
-            public PersonPositionDuration(Person person, String position, int duration) {
-                this.person = person;
-                this.position = position;
-                this.duration = duration;
-            }
+        public PersonPositionDuration(Person person, String position, int duration) {
+            this.person = person;
+            this.position = position;
+            this.duration = duration;
+        }
 
         public Person getPerson() {
             return person;
@@ -52,15 +51,15 @@ public class CollectorsExercise {
             return duration;
         }
 
-            @Override
-            public String toString() {
-                return "PersonPositionDuration{" +
-                        "person=" + person +
-                        ", position='" + position + '\'' +
-                        ", duration=" + duration +
-                        '}';
-            }
+        @Override
+        public String toString() {
+            return "PersonPositionDuration{" +
+                    "person=" + person +
+                    ", position='" + position + '\'' +
+                    ", duration=" + duration +
+                    '}';
         }
+    }
 
     // With the longest duration on single job
     private Map<String, Person> getCoolestByPosition(List<Employee> employees) {
@@ -75,7 +74,7 @@ public class CollectorsExercise {
                 .flatMap(e -> e.getJobHistory().stream()
                         .map(ppd -> new PersonPositionDuration(e.getPerson(), ppd.getPosition(), ppd.getDuration())));
         //make a map that first groupping by position, then collecting to a list, find max duration and return person
-        Map<String, Person> collect1 = personPositionDurationStream
+        Map<String, Person> collection1 = personPositionDurationStream
                 .collect(groupingBy(
                         PersonPositionDuration::getPosition,
                         collectingAndThen(maxBy(comparing(PersonPositionDuration::getDuration)),
@@ -83,29 +82,32 @@ public class CollectorsExercise {
                         )
                 );
         //print result
-        collect1.entrySet().stream().forEach(System.out::println);
+        //System.out.println("===first option");
+        //collection1.entrySet().stream().forEach(System.out::println);
 
         // Second option
         // Collectors.toMap
         // iterate twice: stream...collect(...).stream()...
-        // TODO
-        System.out.println("////");
+        //System.out.println("===second option");
         //make a stream with static possibilities
-        Stream<PersonPositionDuration> personPositionDurationStream1 = employees.stream()
+        Stream<PersonPositionDuration> personPositionDurationStream2 = employees.stream()
                 .flatMap(e -> e.getJobHistory().stream()
                         .map(ppd -> new PersonPositionDuration(e.getPerson(), ppd.getPosition(), ppd.getDuration())));
+        //make a middleware map
+        Map<String, PersonPositionDuration> collection2 = personPositionDurationStream2
+                .collect(toMap(
+                        PersonPositionDuration::getPosition,
+                        Function.identity(),
+                        (pp1, pp2) -> pp1.getDuration() > pp2.getDuration() ? pp1 : pp2));
+        //print it
+        //collection2.entrySet().stream().forEach(System.out::println);
+        //make end map
+        Map<String, Person> collection3 = collection2.entrySet().stream()
+                .collect(toMap(e -> e.getKey(), e -> e.getValue().getPerson()));
+        //print it
+        //collection3.entrySet().stream().forEach(System.out::println);
 
-        personPositionDurationStream1
-                .collect(toMap(PersonPositionDuration::getPosition,
-                        Function.identity(), (pp1, pp2) -> {
-
-                        }
-                        )
-                );
-
-        collect.entrySet().stream().forEach(System.out::println);
-
-        throw new UnsupportedOperationException();
+        return collection3;
     }
 
     @Test
