@@ -121,7 +121,30 @@ public class CollectorsExercise {
     // { John Doe, [{dev, google, 4}, {dev, epam, 4}] } предпочтительнее, чем { A B, [{dev, google, 6}, {QA, epam, 100}]}
     private Map<String, Person> getCoolestByPosition2(List<Employee> employees) {
         // TODO
-        throw new UnsupportedOperationException();
+        //map position -> sum of durations for position
+        final Stream<PersonPositionDuration> stream = employees.stream()
+                .flatMap(e -> {
+                            Map<String, Integer> collect = e.getJobHistory().stream()
+                                    .collect(toMap(
+                                            JobHistoryEntry::getPosition,
+                                            JobHistoryEntry::getDuration,
+                                            (d1, d2) -> d1 + d2
+                                    ));
+                            return collect.entrySet().stream()
+                                    .map(e1 -> new PersonPositionDuration(e.getPerson(), e1.getKey(), e1.getValue()));
+                        }
+                );
+        final Map<String, Person> collectAsMap = stream
+                .collect(groupingBy(
+                        PersonPositionDuration::getPosition,
+                        collectingAndThen(
+                                (maxBy(comparing(PersonPositionDuration::getDuration))),
+                                personPositionDuration -> personPositionDuration.get().getPerson())));
+        //print it
+        collectAsMap.entrySet().stream().forEach(System.out::println);
+
+        //throw new UnsupportedOperationException();
+        return collectAsMap;
     }
 
     private static String generateString() {
